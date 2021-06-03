@@ -1,0 +1,2 @@
+nodeInytegration is on; renderer can run node code
+this code may not work if you set it up differently.

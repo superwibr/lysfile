@@ -7,11 +7,11 @@ function createWindow () {
     height: 600,
     webPreferences: {
       nodeIntegration: true,
-      preload: path.join(__dirname, 'preload.js')
+      contextIsolation: false
     }
   })
 
-  mainWindow.loadFile('./renderer/index.html')
+  mainWindow.loadFile('index.html')
 
 }
 
