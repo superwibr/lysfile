@@ -1,5 +1,5 @@
-import { ipcRenderer } from "electron";
+const { ipcRenderer } = require("electron");
 
 function pingpong(){
-	ipcRenderer.sendSync('test', 'ping')
+	console.log(ipcRenderer.sendSync('test', 'ping'))
 }
