@@ -2,9 +2,9 @@
   "name": "lysfile",
   "version": "0.0.1",
   "description": "Will read .lys files from lysent.<br> Will probably also create them.<br> If this switch is off it doesn't work:<br> [off] <br> <br> <br> <br>",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron ."
   },
   "repository": {
     "type": "git",
