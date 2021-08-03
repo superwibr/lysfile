@@ -9,6 +9,6 @@ If this switch is off it doesn't work:<br>
 <br>
 <br>
 
-## Required stuff
-
-electron (npm install electron --save-dev)
+# usage
+you can use a prebuilt release or build it yourself from the following instructions:
+h
