@@ -1,9 +1,0 @@
-{
-	"protocol":"BUNDL",
-	"params":[
-		"raw"
-	],
-	"content":[
-		{"name":"file1.txt", "content":"This is a file."}
-	]
-}
