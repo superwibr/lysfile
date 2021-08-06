@@ -1,0 +1,26 @@
+{
+  "name": "lysfile",
+  "version": "0.0.1",
+  "description": "read/write .lys files",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/superwibr/lysfile.git"
+  },
+  "author": "lysent ent",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^13.1.7",
+    "electron-builder": "^22.11.7"
+  },
+  "postinstall": "electron-builder install-app-deps",
+  "build": {
+    "appId": "ent.lysent.lysfile",
+    "mac": {
+      "category": "your.app.category.type"
+    }
+  }
+}
