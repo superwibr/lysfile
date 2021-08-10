@@ -15,6 +15,7 @@ LYSfile types
 	0x0013 Interactive book
 	0x0014 Readable bundle
 	0x0015 AudioLoop
+	0x0016 BJTEMP
 
 Chunk types
 	0x0030 Typeless entry

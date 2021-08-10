@@ -35,23 +35,36 @@ class DataInput:
 
 
 class DataOutput:
-	def __init__(self, stream):
-		self._stream = stream
+	def __init__(self):
+		self._stream = []
 		self._position = 0
 
 	# Write unsigned integers
 	def writeU8(self, value:int):
 		value &= 0xFF
-		self._stream.write(value)
+		self._stream.append(value)
 		self._position+=1
 
 	def writeU(self, nbytes:int, value:int):
-		value &= 0xFF
+		nbc = nbytes
+		andmt = ""
+		while nbc > 0:
+			andmt+="ff"
+			nbc-=1
+
+		if type(value) == bytes:
+			value = int.from_bytes(value, byteorder='big')
+			
+		value = value & int(andmt, base=16)
+
 		multiple = nbytes*8-8
-		bytepos = 0
-		value = bytes.fromhex(str(hex(0xff10))[2:])
 		while multiple >= 0:
-			self.writeU8( value[bytepos] >> multiple)
+			if multiple < 0:
+				break
+			self.writeU8( value >> multiple)
 			multiple-=8
-			bytepos+=1
 		return value
+
+	# return 
+	def returnBytes(self):
+		return bytes(self._stream)
