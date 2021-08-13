@@ -1,0 +1,1 @@
+The documentation files are meant to be read in a text editor and not as parsed markdown
