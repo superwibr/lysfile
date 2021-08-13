@@ -1,15 +1,18 @@
 from  . import data as lys
+import bson
+import json
+from err import *
 
 ##################
 # CONSTANTS
 _MNUM = 0x894C59530D0A1A0A or b'\211LYS\r\n\032\n'
 _FTYPES = {
-	0x0010 : "Typeless",
-	0x0011 : "Bundle",
-	0x0012 : "Links",
-	0x0013 : "Interactive book",
-	0x0014 : "Readable bundle",
-	0x0015 : "AudioLoop",
+	0x0010 : "NTYP",
+	0x0011 : "BUNDL",
+	0x0012 : "LINKS",
+	0x0013 : "IBOOK",
+	0x0014 : "RBUND",
+	0x0015 : "RSND",
 	0x0016 : "BJTEMP"
 }
 def _FTYPESS(search):
@@ -23,6 +26,8 @@ _CTYPES = {
 	0x0034 : "AudioSection",
 	0x003f : "EOF",
 }
+def _CTYPESS(search):
+	return (list(_CTYPES.keys())[list(_CTYPES.values()).index(search)])
 
 ###############
 #  READER
@@ -61,9 +66,8 @@ class Reader:
 		lf['typ'] = _FTYPES[lf['typ']]
 		if lf['typ'] == "BJTEMP":
 			bj = self._data[12:]
-			j = bj.decode("utf-8")
-
-			lf['BJTEMP']=j
+			j = bson.loads(bj)
+			lf["chunks"].append(j)
 			return lf
 
 		return lf
@@ -71,18 +75,28 @@ class Reader:
 ###############
 #  WRITER
 class Writer:
-	def __init__(self, outFile, inFile=None):
+	def __init__(self, outFile, inFile):
 		self._writer = open(outFile, 'wb')
 		self._output	= lys.DataOutput()
 		
-		if inFile:
-			with open(inFile, 'rb') as input:
-				self._input = input.read()
+		with open(inFile, 'rb') as input:
+			self._input = input.read()
+			self._input = json.loads(self._input)
 
 		self._type = _FTYPESS("BJTEMP")# current default, change later
 
-	def writeChunk(self):
-		pass
+	def writeChunk(self, chunk):
+		o = self._output
+
+		o.writeU(2, _CTYPESS(chunk['type']))
+		content=None
+		
+		if chunk['type'] == 'File' and chunk['src']:
+			with open(chunk['src'], 'rb') as fileread:
+				content = fileread.read()
+
+
+		return
 
 	def write(self):
 		o = self._output
@@ -94,9 +108,19 @@ class Writer:
 
 		# Writing body
 		if self._type == _FTYPESS("BJTEMP"):
-			o.writeU(len(self._input), self._input)
+			lbson = bson.dumps(self._input) 
+			o.writeU(len(lbson), lbson)
 			if len(self._input) % 2 != 0:
 				o.writeU(1, 0x00)
+
+		elif self._type == _FTYPESS("BUNDL"):
+			chunks = self._input.chunks
+			act = []
+			for chunk in chunks:
+				if chunk.type not in act:
+					raise IllegalChunkTypeError(f"[LYS Writer] ")
+				else:
+					self.writeChunk(chunk)
 
 
 		# write, close file and return

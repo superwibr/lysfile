@@ -3,8 +3,8 @@ Bytes (big-endian)
 	+08 2B Version number (presently 1)
 	+09 2B LYSfile type
 	+0a *B *Chunks
-		+00 4B Chunk type ID 
-		+04 4B Chunk length (in bytes)
+		+00 2B Chunk type ID 
+		+04 6B Chunk length (in bytes)
 		+08 *B Chunk data
 	+0a 4B EOF
 
@@ -12,9 +12,7 @@ LYSfile types
 	0x0010 Typeless
 	0x0011 Bundle
 	0x0012 Links
-	0x0013 Interactive book
 	0x0014 Readable bundle
-	0x0015 AudioLoop
 	0x0016 BJTEMP
 
 Chunk types
@@ -22,5 +20,4 @@ Chunk types
 	0x0031 File
 	0x0032 JSON
 	0x0033 ReadableSection
-	0x0034 AudioSection
 	0x003f EOF

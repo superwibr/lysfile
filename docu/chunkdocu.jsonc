@@ -1,0 +1,23 @@
+{
+	"type":"NTYP",	// LYSfile type 
+	"chunks":[		// Chunks in an array
+		{
+			"type":"File",			// Chunk type, case sensitive
+			"src":"/foo/bar.txt"	// The file chunk is read from the src value
+		},
+		{
+			"type":"JSON",
+			"content":[		// The json chunk is built from plain json, not a string.
+				"any",
+				"JSON"
+			]
+		},
+		{
+			"type":"ReadableSection",
+			"content":"ascii characters"	// The ReadableSection chunk is built from a base122 encodable string
+		},
+		{
+
+		}
+	]
+}
