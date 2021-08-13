@@ -1,12 +1,12 @@
-let subpy;
 const { app, BrowserWindow } = require('electron')
+let subpy;
 
 // input
 if (app.isPackaged) {
   // workaround for missing executable argument)
   process.argv.unshift(null)
 }
-// parameters is now an array containing any files/folders that your OS will pass to your application
+// parameters is now an array containing any files/folders that OS will pass to application
 const parameters = process.argv.slice(2)
 
 // window
