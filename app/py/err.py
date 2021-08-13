@@ -1,10 +1,13 @@
-class Error(Exception):
-	pass
+# Base
+class Error(Exception):pass
 
-class IllegalChunkTypeError(Error):
-	def __init__(self, message):            
-		super().__init__(message)
+# Illegal
+class IllegalChunkTypeError(Error):pass
+class IllegalFileTypeError(Error):pass
+class IllegalIdentifierError(Error):pass
 
-class IllegalIdentifierError(Error):
-	def __init__(self, message):            
-		super().__init__(message)
+# Missing
+class MissingChunkTypeError(Error):pass
+class MissingFileTypeError(Error):pass
+class MissingTypeError(Error):pass
+class MissingValueError(Error):pass

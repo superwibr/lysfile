@@ -1,3 +1,4 @@
+from inspect import EndOfBlock
 from  . import data as lys
 import bson
 import json
@@ -10,9 +11,7 @@ _FTYPES = {
 	0x0010 : "NTYP",
 	0x0011 : "BUNDL",
 	0x0012 : "LINKS",
-	0x0013 : "IBOOK",
 	0x0014 : "RBUND",
-	0x0015 : "RSND",
 	0x0016 : "BJTEMP"
 }
 def _FTYPESS(search):
@@ -23,7 +22,6 @@ _CTYPES = {
 	0x0031 : "File",
 	0x0032 : "JSON",
 	0x0033 : "ReadableSection",
-	0x0034 : "AudioSection",
 	0x003f : "EOF",
 }
 def _CTYPESS(search):
@@ -52,16 +50,16 @@ class Reader:
 
 		lf['id'] = input.readU(8)
 		if lf['id'] != _MNUM:
-			raise Exception('[LYS Reader] Incorrect magic number! File may be not in LYS format, corrupt or outdated.')
+			raise IllegalIdentifierError('[LYS Reader] Incorrect magic number! File may be not in LYS format, corrupt or outdated.')
 		lf['id'] = _MNUM
 
 		lf['ver'] = input.readU(2)
 		if lf['ver'] < 0x0001:
-			raise Exception('[LYS Reader] Version is below 1! File may be corrupt.')
+			raise IllegalIdentifierError('[LYS Reader] Version is below 1! File may be corrupt.')
 
 		lf['typ'] = input.readU(2)
 		if lf['typ'] not in [*_FTYPES]:
-			raise Exception('[LYS Reader] LYSfile type not an accepted type! File may be corrupt or outdated.')
+			raise IllegalIdentifierError('[LYS Reader] LYSfile type not an accepted type! File may be corrupt or outdated.')
 
 		lf['typ'] = _FTYPES[lf['typ']]
 		if lf['typ'] == "BJTEMP":
@@ -76,26 +74,50 @@ class Reader:
 #  WRITER
 class Writer:
 	def __init__(self, outFile, inFile):
-		self._writer = open(outFile, 'wb')
+		self._outPath 	= outFile
 		self._output	= lys.DataOutput()
+		self._inPath	= inFile
 		
 		with open(inFile, 'rb') as input:
 			self._input = input.read()
 			self._input = json.loads(self._input)
 
-		self._type = _FTYPESS("BJTEMP")# current default, change later
+		self._type = _FTYPESS(self._input['type'])
 
 	def writeChunk(self, chunk):
 		o = self._output
 
 		o.writeU(2, _CTYPESS(chunk['type']))
 		content=None
-		
-		if chunk['type'] == 'File' and chunk['src']:
+
+		if chunk['type'] == None:
+			raise MissingChunkTypeError("[LYS Writer] A chunk type could not be found!")
+		elif chunk['type'] == 'Typeless':
+			pass
+		elif chunk['type'] == 'File':
 			with open(chunk['src'], 'rb') as fileread:
 				content = fileread.read()
+		elif chunk['type'] == 'JSON':
+			pass
+		elif chunk['type'] == 'ReadableSection':
+			pass
+		elif chunk['type'] == 'EOF':
+			return 'EOF'
+		else:
+			raise IllegalChunkTypeError(f"[LYS Writer] Chunk type \"[{chunk['type']}\" invalid!")
 
+		o.writeU(6, len(content))
 
+		return
+
+	def writeChunks(self, accepted):
+		chunks = self._input['chunks']
+		for chunk in chunks:
+			if chunk['type'] not in accepted:
+				raise IllegalChunkTypeError(f"[LYS Writer] Chunk of type {chunk['type']} not accepted for LYS document of type {self._input['type']}")
+			else:
+				ret = self.writeChunk(chunk)
+				if ret == 'EOF': break
 		return
 
 	def write(self):
@@ -107,24 +129,20 @@ class Writer:
 		o.writeU(2, self._type)					;print("[LYS Writer] Pushed type to bytes")
 
 		# Writing body
-		if self._type == _FTYPESS("BJTEMP"):
-			lbson = bson.dumps(self._input) 
+		if self._input['type'] == _FTYPESS("BJTEMP"):
+			content = self._input['chunks'][0]['content']
+			lbson = bson.dumps(content) 
 			o.writeU(len(lbson), lbson)
-			if len(self._input) % 2 != 0:
+			if len(content) % 2 != 0:
 				o.writeU(1, 0x00)
 
 		elif self._type == _FTYPESS("BUNDL"):
-			chunks = self._input.chunks
-			act = []
-			for chunk in chunks:
-				if chunk.type not in act:
-					raise IllegalChunkTypeError(f"[LYS Writer] ")
-				else:
-					self.writeChunk(chunk)
+			self.writeChunks(["File"])
 
 
 		# write, close file and return
-		self._writer.write(o.returnBytes())		;print("[LYS Writer] Wrote bytes to output file")
-		self._writer.close()					;print("[LYS Writer] Closed output file")
+		writer = open(self._outPath, 'wb')	;print("[LYS Writer] Opened output file")
+		writer.write(o.returnBytes())		;print("[LYS Writer] Wrote bytes to output file")
+		writer.close()						;print("[LYS Writer] Closed output file")
 		return
 

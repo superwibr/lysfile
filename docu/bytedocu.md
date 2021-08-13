@@ -4,7 +4,7 @@ Bytes (big-endian)
 	+09 2B LYSfile type
 	+0a *B *Chunks
 		+00 2B Chunk type ID 
-		+04 6B Chunk length (in bytes)
+		+02 6B Chunk length (in bytes)
 		+08 *B Chunk data
 	+0a 4B EOF
 
